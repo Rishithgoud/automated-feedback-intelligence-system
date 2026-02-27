@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Submit Feedback</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='feedback.css') }}">
+</head>
+
+<body>
+
+<div class="feedback-container">
+
+<form method="POST" enctype="multipart/form-data">
+<p style="font-size:14px;color:#555">
+<b>State:</b> {{ state }} |
+<b>District:</b> {{ district }} |
+<b>Village:</b> {{ village }} |
+<b>Scheme:</b> {{ scheme }}
+</p>
+
+  <!-- AREA DETAILS -->
+  <input type="hidden" name="state" value="{{ state }}">
+  <input type="hidden" name="district" value="{{ district }}">
+  <input type="hidden" name="mandal" value="{{ mandal }}">
+  <input type="hidden" name="village" value="{{ village }}">
+  <input type="hidden" name="scheme" value="{{ scheme }}">
+
+  <h2>Give Feedback for {{ scheme }}</h2>
+
+  <!-- TEXT FEEDBACK -->
+  <textarea name="feedback"
+            placeholder="Type your feedback or record voice below"></textarea>
+
+  <hr>
+
+  <!-- VOICE RECORD -->
+  <h4>🎙️ Or Record Voice</h4>
+
+  <button type="button" onclick="startRecording()">Start Recording</button>
+  <button type="button" onclick="stopRecording()">Stop</button>
+
+  <audio id="audioPlayback" controls></audio>
+
+  <input type="file" id="voiceInput" name="voice" hidden>
+
+  <br><br>
+  <button type="submit">Submit Feedback</button>
+
+</form>
+
+</div>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+        audioChunks = [];
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    });
+}
+
+function stopRecording() {
+    mediaRecorder.stop();
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: "audio/wav" });
+        const file = new File([blob], "voice.wav", { type: "audio/wav" });
+
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("voiceInput").files = dt.files;
+
+        document.getElementById("audioPlayback").src =
+            URL.createObjectURL(blob);
+    };
+}
+</script>
+
+</body>
+</html>

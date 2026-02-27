@@ -1,0 +1,87 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #f4f6f9;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(90deg, #0b3c5d, #1f6aa5);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header a {
+    color: #ffdd57;
+    text-decoration: none;
+}
+
+/* MAIN */
+.container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* FILTERS */
+.filters {
+    width: 260px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.filters h3 {
+    margin-bottom: 15px;
+    color: #0b3c5d;
+}
+
+.filters select,
+.filters button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.filters button {
+    background: #0b3c5d;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.filters button:hover {
+    background: #092c45;
+}
+
+/* REPORTS */
+.reports {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.report-card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.report-card h4 {
+    margin: 0;
+    color: #0b3c5d;
+}
+
+.report-card p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}

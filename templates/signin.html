@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sign In</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth">
+
+<div class="auth-card">
+    <img src="{{ url_for('static', filename='emblem.png') }}" class="emblem small">
+
+    <h2>Sign in</h2>
+    <p>Use your account</p>
+
+    <form method="POST">
+        <input type="email" name="email" placeholder="Email address" required>
+
+        <select name="role" required>
+            <option value="">Select Role</option>
+            <option value="public">Public User</option>
+            <option value="govt">Government Official</option>
+        </select>
+
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button class="btn primary full">Next</button>
+    </form>
+
+    <p class="link">
+        Don’t have an account? <a href="/signup">Create account</a>
+    </p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scheme Report</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='govt_dashboard.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+th {
+    background: #f2f2f2;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div>📑 Scheme Report</div>
+    <a href="/govt/dashboard">⬅ Back to Dashboard</a>
+</header>
+
+<section class="reports">
+
+{% if type == "summary" %}
+<div class="report-card">
+    <h3>📊 Overall AI Summary</h3>
+    <p id="summary">Loading...</p>
+</div>
+{% endif %}
+
+{% if type == "issues" %}
+<div class="report-card">
+    <h3>⚠️ Issue Classification</h3>
+    <table id="issueTable">
+        <thead>
+            <tr>
+                <th>State</th><th>District</th><th>Mandal</th><th>Area</th>
+                <th>Issue</th><th>Complaints</th><th>Severity</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if type == "performance" %}
+<div class="report-card">
+    <h3>📈 Scheme Performance</h3>
+
+    <div id="performanceBox">Loading...</div>
+</div>
+
+<script>
+(function(){
+     const state = "{{state}}";
+const district = "{{district}}";
+const mandal = "{{mandal}}";
+const village = "{{village}}";
+const scheme = "{{scheme}}";
+fetch(`/api/report/performance?state=${state}&district=${district}&mandal=${mandal}&village=${village}&scheme=${scheme}`)
+.then(res => res.json())
+.then(d => {
+
+    if (d.empty) {
+        document.getElementById("performanceBox").innerHTML =
+            "<p>No performance data available.</p>";
+        return;
+    }
+
+    document.getElementById("performanceBox").innerHTML = `
+        <h4>🧾 Scheme Performance Report</h4>
+
+        <p><b>Scheme Name:</b> ${d.header.scheme}</p>
+        <p><b>Region:</b> ${d.header.region}</p>
+        <p><b>Report Date:</b> ${d.header.date}</p>
+
+        <hr>
+
+        <p><b>Current Status:</b> ${d.status}</p>
+
+        <hr>
+
+        <table>
+            <tr><th>Performance Indicator</th><th>Value</th></tr>
+            <tr><td>Total Feedback Received</td><td>${d.metrics.total}</td></tr>
+            <tr><td>Complaints Raised</td><td>${d.metrics.complaints}</td></tr>
+            <tr><td>High Severity Issues</td><td>${d.metrics.high_severity}</td></tr>
+            <tr><td>Pending / Unresolved</td><td>${d.metrics.pending}</td></tr>
+            <tr><td>Average Resolution Delay</td><td>${d.metrics.avg_delay} days</td></tr>
+        </table>
+
+        <hr>
+
+        <p><b>Major Issues Impacting Scheme Performance:</b></p>
+        <ul>
+            ${d.issues.map(i => `<li>${i.issue} (${i.percent}%)</li>`).join("")}
+        </ul>
+
+        <hr>
+
+        <p><b>Administrative Action Required:</b></p>
+        <ul>
+            ${d.actions.map(a => `<li>${a}</li>`).join("")}
+        </ul>
+    `;
+});
+})();
+</script>
+{% endif %}
+
+
+{% if type == "executive" %}
+<div class="report-card">
+    <h3>🤖 AI Executive Insight</h3>
+    <p id="insight">Loading...</p>
+</div>
+
+<script>
+fetch("/api/executive/insight")
+.then(res => res.json())
+.then(d => {
+    document.getElementById("insight").innerText = d.insight;
+})
+.catch(() => {
+    document.getElementById("insight").innerText =
+        "Unable to generate executive insight at this time.";
+});
+</script>
+{% endif %}
+
+
+{% if type == "public_feedback" %}
+<div class="report-card">
+    <h3>🗣 Public Feedback – Selected Region</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Feedback</th>
+                <th>Issue</th>
+                <th>Sentiment</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if feedbacks %}
+            {% for f in feedbacks %}
+            <tr>
+                <td>{{ f.created_at }}</td>
+                <td>{{ f.feedback }}</td>
+                <td>{{ f.issue }}</td>
+                <td><b>{{ f.sentiment }}</b></td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No feedback submitted for this region</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+</section>
+
+<script>
+const state="{{state}}", district="{{district}}", mandal="{{mandal}}", village="{{village}}", scheme="{{scheme}}";
+</script>
+
+{% if type == "summary" %}
+<script>
+fetch(`/api/report?state=${state}&district=${district}&mandal=${mandal}&village=${village}&scheme=${scheme}`)
+.then(res=>res.json())
+.then(d=>document.getElementById("summary").innerText=d.summary);
+</script>
+{% endif %}
+
+{% if type == "issues" %}
+<script>
+fetch(`/api/issues/region-scheme?
+state={{state}}&
+district={{district}}&
+mandal={{mandal}}&
+village={{village}}&
+scheme={{scheme}}`)
+.then(res => res.json())
+.then(data => {
+
+    const tbody = document.querySelector("#issueTable tbody");
+    tbody.innerHTML = "";
+
+    data.forEach(i => {
+        tbody.innerHTML += `
+        <tr>
+            <td>{{state}}</td>
+            <td>{{district}}</td>
+            <td>{{mandal}}</td>
+            <td>{{village}}</td>
+            <td>${i.issue}</td>
+            <td>${i.complaints}</td>
+            <td><b>${i.severity}</b></td>
+        </tr>`;
+    });
+});
+
+</script>
+{% endif %}
+
+</body>
+</html>

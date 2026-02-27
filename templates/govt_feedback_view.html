@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Feedback Details</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='govt_dashboard.css') }}">
+</head>
+
+<body>
+
+<header class="header">
+    <div>🗣️ Feedback Details</div>
+    <a href="/govt/dashboard">⬅ Back</a>
+</header>
+
+<section class="report-card">
+
+    <p><b>Scheme:</b> {{ feedback["scheme"] }}</p>
+    <p><b>Location:</b> {{ feedback["village"] }},
+         {{ feedback["mandal"] }},
+       {{ feedback["district"] }},
+       {{ feedback["state"] }}</p>
+
+    <p><b>Date:</b> {{ feedback["created_at"] }}</p>
+    <p><b>Issue Category:</b> {{ feedback["issue"] }}</p>
+    <p><b>Sentiment:</b> {{ feedback["sentiment"] }}</p>
+
+    <hr>
+
+    <p><b>Citizen Feedback:</b></p>
+    <p style="background:#f9f9f9;padding:12px;border-radius:6px;">
+        {{ feedback["feedback"] }}
+    </p>
+<script>
+fetch("/api/recent-feedback")
+.then(res => {
+    if (!res.ok) throw new Error("API failed");
+    return res.json();
+})
+.then(data => {
+
+    const container = document.getElementById("recentFeedback");
+    container.innerHTML = "";
+
+    if (data.length === 0) {
+        container.innerHTML = "<p>No feedback available</p>";
+        return;
+    }
+
+    data.forEach(f => {
+        container.innerHTML += `
+            <div class="feedback-card">
+                <p><b>${f.scheme}</b> – ${f.village}</p>
+                <p>${f.feedback}</p>
+                <small>
+                    Issue: ${f.issue} |
+                    Sentiment: ${f.sentiment} |
+                    ${f.date}
+                </small>
+            </div>
+        `;
+    });
+})
+.catch(err => {
+    console.error(err);
+    document.getElementById("recentFeedback").innerHTML =
+        "<p>Error loading feedback</p>";
+});
+</script>
+
+</section>
+
+</body>
+</html>

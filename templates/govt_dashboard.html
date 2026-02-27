@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Government Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='govt_dashboard.css') }}">
+</head>
+
+<body>
+
+<header class="header">
+    <div>🏛 Government Official Dashboard</div>
+    <div>{{ session.email }} | <a href="/logout">Logout</a></div>
+</header>
+
+<div class="container">
+
+<!-- FILTER PANEL -->
+<aside class="filters">
+    <h3>Select Area</h3>
+
+    <select id="state"><option value="">Select State</option></select>
+    <select id="district"><option value="">Select District</option></select>
+    <select id="mandal"><option value="">Select Mandal</option></select>
+    <select id="village"><option value="">Select Village</option></select>
+    <select id="scheme"><option value="">Select Scheme</option></select>
+</aside>
+
+<!-- REPORT CARDS -->
+<section class="reports">
+
+    <div class="report-card">
+        <h4>📊 Overall Feedback Summary</h4>
+        <button onclick="openReport('summary')">View Report</button>
+    </div>
+   <div class="report-card">
+    <h4>🗣 Public Feedback</h4>
+    <button onclick="openReport('public_feedback')">View Report</button>
+</div>
+
+
+
+</div>
+
+    <div class="report-card">
+        <h4>⚠️ Issue Classification</h4>
+        <button onclick="openReport('issues')">View Report</button>
+    </div>
+
+    <div class="report-card">
+        <h4>📈 Scheme Performance</h4>
+        <button onclick="openReport('performance')">View Report</button>
+    </div>
+
+    <div class="report-card">
+        <h4>🤖 AI Executive Insight</h4>
+        <button onclick="openReport('executive')">View Report</button>
+    </div>
+
+</section>
+</div>
+
+<script>
+const stateSel = document.getElementById("state");
+const districtSel = document.getElementById("district");
+const mandalSel = document.getElementById("mandal");
+const villageSel = document.getElementById("village");
+const schemeSel = document.getElementById("scheme");
+
+let DATA = {};
+
+fetch("/api/schemes")
+.then(res => res.json())
+.then(data => {
+    DATA = data;
+    Object.keys(DATA).forEach(s => {
+        stateSel.innerHTML += `<option value="${s}">${s}</option>`;
+    });
+});
+
+stateSel.addEventListener("change", () => {
+    districtSel.innerHTML = `<option value="">Select District</option>`;
+    mandalSel.innerHTML = `<option value="">Select Mandal</option>`;
+    villageSel.innerHTML = `<option value="">Select Village</option>`;
+    schemeSel.innerHTML = `<option value="">Select Scheme</option>`;
+    if (!stateSel.value) return;
+    Object.keys(DATA[stateSel.value]).forEach(d => {
+        districtSel.innerHTML += `<option value="${d}">${d}</option>`;
+    });
+});
+districtSel.addEventListener("change", () => {
+    mandalSel.innerHTML = `<option value="">Select Mandal</option>`;
+    villageSel.innerHTML = `<option value="">Select Village</option>`;
+    schemeSel.innerHTML = `<option value="">Select Scheme</option>`;
+    if (!districtSel.value) return;
+    Object.keys(DATA[stateSel.value][districtSel.value]).forEach(m => {
+        mandalSel.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+    });
+mandalSel.addEventListener("change", () => {
+    villageSel.innerHTML = `<option value="">Select Village</option>`;
+    schemeSel.innerHTML = `<option value="">Select Scheme</option>`;
+    if (!mandalSel.value) return;
+    Object.keys(DATA[stateSel.value][districtSel.value][mandalSel.value]).forEach(v => {
+        villageSel.innerHTML += `<option value="${v}">${v}</option>`;
+    });
+});
+
+villageSel.addEventListener("change", () => {
+    schemeSel.innerHTML = `<option value="">Select Scheme</option>`;
+    if (!villageSel.value) return;
+    DATA[stateSel.value][districtSel.value][mandalSel.value][villageSel.value]
+    .forEach(s => schemeSel.innerHTML += `<option value="${s}">${s}</option>`);
+});
+
+function openReport(type) {
+    if (!stateSel.value || !districtSel.value || !mandalSel.value || !villageSel.value || !schemeSel.value) {
+        alert("Please select all fields");
+        return;
+    }
+
+    window.location.href =
+        `/govt/report?type=${type}` +
+        `&state=${stateSel.value}` +
+        `&district=${districtSel.value}` +
+        `&mandal=${mandalSel.value}` +
+        `&village=${villageSel.value}` +
+        `&scheme=${schemeSel.value}`;
+}
+
+</script>
+<script>
+
+function loadRegionFeedback() {
+
+    if (!stateSel.value || !districtSel.value || !mandalSel.value || !villageSel.value || !schemeSel.value) {
+        return;
+    }
+
+    const tbody = document.querySelector("#feedbackTable tbody");
+    tbody.innerHTML = `<tr><td colspan="4">Loading feedback...</td></tr>`;
+
+    fetch(`/api/feedback/region?state=${stateSel.value}&district=${districtSel.value}&mandal=${mandalSel.value}&village=${villageSel.value}&scheme=${schemeSel.value}`)
+    .then(res => res.json())
+    .then(data => {
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4">No feedback submitted for this region</td></tr>`;
+            return;
+        }
+
+        data.forEach(f => {
+    tbody.innerHTML += `
+        <tr>
+            <td>${f.date}</td>
+            <td>${f.issue}</td>
+            <td><b>${f.sentiment}</b></td>
+            <td>
+                <a href="/govt/feedback/${f.id}" target="_blank">
+                    View
+                </a>
+            </td>
+        </tr>
+    `;
+});
+
+    })
+    .catch(() => {
+        tbody.innerHTML = `<tr><td colspan="4">Error loading feedback</td></tr>`;
+    });
+}
+
+/* 🔥 AUTO LOAD WHEN SCHEME IS SELECTED */
+schemeSel.addEventListener("change", loadRegionFeedback);
+/* ================= PUBLIC FEEDBACK TABLE ================= */
+fetch(`/api/feedback/region?state=${state}&district=${district}&mandal=${mandal}&village=${village}&scheme=${scheme}`)
+.then(res => res.json())
+.then(data => {
+
+    const tbody = document.querySelector("#feedbackTable tbody");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4">No feedback submitted for this region</td></tr>`;
+        return;
+    }
+
+    data.forEach(f => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${f.date}</td>
+                <td>${f.feedback}</td>
+                <td>${f.issue}</td>
+                <td><b>${f.sentiment}</b></td>
+            </tr>
+        `;
+    });
+})
+.catch(() => {
+    document.querySelector("#feedbackTable tbody").innerHTML =
+        `<tr><td colspan="4">Error loading feedback</td></tr>`;
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    fetch("/api/feedback/recent")
+    .then(res => res.json())
+    .then(data => {
+        const list = document.getElementById("feedbackList");
+        list.innerHTML = "";
+
+        if (data.length === 0) {
+            list.innerHTML = "<li>No feedback submitted yet</li>";
+            return;
+        }
+
+        data.forEach(f => {
+            list.innerHTML += `
+            <li style="margin-bottom:12px;">
+                <b>${f.scheme}</b> – ${f.village}<br>
+                "${f.feedback.substring(0, 100)}..."<br>
+                <small>
+                    ${f.issue} | ${f.sentiment} | ${f.created_at}
+                </small><br>
+                <a href="/govt/feedback/${f.id}">View</a>
+            </li>
+            `;
+        });
+    })
+    .catch(err => {
+        document.getElementById("feedbackList").innerHTML =
+            "<li>Error loading feedback</li>";
+        console.error(err);
+    });
+
+});
+</script>
+<script>
+function openPublicFeedback() {
+
+    if (!stateSel.value || !districtSel.value || !mandalSel.value || !villageSel.value || !schemeSel.value) {
+        alert("Please select all fields");
+        return;
+    }
+
+    window.location.href =
+        `/govt/feedback/view` +
+        `?state=${stateSel.value}` +
+        `&district=${districtSel.value}` +
+        `&mandal=${mandalSel.value}` +
+        `&village=${villageSel.value}` +
+        `&scheme=${schemeSel.value}`;
+}
+</script>
+
+</body>
+</html>

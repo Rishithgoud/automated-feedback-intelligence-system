@@ -1,0 +1,85 @@
+/* ---------- LANDING ---------- */
+body.landing {
+    background: #f5f7fa;
+    text-align: center;
+    font-family: "Segoe UI", sans-serif;
+}
+
+.landing-header {
+    padding: 70px 20px 30px;
+}
+
+.emblem {
+    width: 90px;
+    margin-bottom: 15px;
+}
+
+.landing-actions {
+    margin-top: 40px;
+}
+
+footer {
+    margin-top: 80px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+    padding: 14px 32px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 10px;
+}
+
+.btn.primary {
+    background: #0b5ed7;
+    color: white;
+}
+
+.btn.outline {
+    border: 2px solid #0b5ed7;
+    color: #0b5ed7;
+}
+
+/* ---------- AUTH ---------- */
+body.auth {
+    background: #eef1f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.auth-card {
+    background: white;
+    padding: 40px;
+    width: 360px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.emblem.small {
+    width: 60px;
+}
+
+.auth-card input,
+.auth-card select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.btn.full {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.link {
+    margin-top: 20px;
+    font-size: 14px;
+}

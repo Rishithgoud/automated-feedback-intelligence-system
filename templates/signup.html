@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Create Account</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth">
+
+<div class="auth-card">
+    <img src="{{ url_for('static', filename='emblem.png') }}" class="emblem small">
+
+    <h2>Create account</h2>
+
+    <form method="POST">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email address" required>
+
+        <select name="role" required>
+            <option value="">Account Type</option>
+            <option value="public">Public</option>
+            <option value="govt">Government Official</option>
+        </select>
+
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button class="btn primary full">Create Account</button>
+    </form>
+
+    <p class="link">
+        Already have an account? <a href="/signin">Sign in</a>
+    </p>
+</div>
+
+</body>
+</html>

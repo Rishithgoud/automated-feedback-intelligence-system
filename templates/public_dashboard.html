@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Public Scheme Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='public_dashboard.css') }}">
+
+<div id="notificationBox" style="display:none; background:#e6f7ff; padding:12px; margin-bottom:12px;">
+    <b>🔔 Notification</b><br>
+    <span id="notificationText"></span>
+</div>
+</head>
+
+<body>
+
+<div class="top-bar">
+    <div class="title">🇮🇳 Public Scheme Dashboard</div>
+    <div class="user-info">
+        {{ session.email }} | <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div class="main">
+
+<!-- LEFT -->
+<div class="panel left">
+    <h3>Select Your Region</h3>
+
+    <select id="state"><option value="">Select State</option></select>
+    <select id="district"><option value="">Select District</option></select>
+    <select id="mandal"><option value="">Select Mandal</option></select>
+    <select id="village"><option value="">Select Village</option></select>
+
+    <h3>Schemes Available</h3>
+    <div id="schemeList"></div>
+</div>
+
+<!-- RIGHT -->
+<div class="panel right">
+    <h3>Scheme Report</h3>
+    <div id="reportBox">Select a scheme to view report</div>
+
+    <hr>
+    <h3>🧾 Your Feedback</h3>
+    <button id="viewMyFeedbackBtn" class="btn report-btn" disabled>👁 View My Feedback</button>
+
+    <table id="myFeedbackTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Scheme</th>
+                <th>Region</th>
+                <th>Feedback</th>
+                <th>Issue</th>
+                <th>Sentiment</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+</div>
+
+<script>
+const stateSel = document.getElementById("state");
+const districtSel = document.getElementById("district");
+const mandalSel = document.getElementById("mandal");
+const villageSel = document.getElementById("village");
+
+const schemeList = document.getElementById("schemeList");
+const reportBox = document.getElementById("reportBox");
+const viewBtn = document.getElementById("viewMyFeedbackBtn");
+const table = document.getElementById("myFeedbackTable");
+const tbody = table.querySelector("tbody");
+
+let DATA = {};
+let selectedScheme = null;
+
+/* LOAD DATA */
+fetch("/api/schemes").then(r => r.json()).then(data => {
+    DATA = data;
+    Object.keys(DATA).forEach(s =>
+        stateSel.innerHTML += `<option value="${s}">${s}</option>`
+    );
+});
+
+/* STATE */
+stateSel.onchange = () => {
+    districtSel.innerHTML = `<option value="">Select District</option>`;
+    mandalSel.innerHTML = `<option value="">Select Mandal</option>`;
+    villageSel.innerHTML = `<option value="">Select Village</option>`;
+    schemeList.innerHTML = "";
+    if (!stateSel.value) return;
+
+    Object.keys(DATA[stateSel.value]).forEach(d =>
+        districtSel.innerHTML += `<option value="${d}">${d}</option>`
+    );
+};
+
+/* DISTRICT */
+districtSel.onchange = () => {
+    mandalSel.innerHTML = `<option value="">Select Mandal</option>`;
+    villageSel.innerHTML = `<option value="">Select Village</option>`;
+    schemeList.innerHTML = "";
+    if (!districtSel.value) return;
+
+    Object.keys(DATA[stateSel.value][districtSel.value]).forEach(m =>
+        mandalSel.innerHTML += `<option value="${m}">${m}</option>`
+    );
+};
+
+/* MANDAL */
+mandalSel.onchange = () => {
+    villageSel.innerHTML = `<option value="">Select Village</option>`;
+    schemeList.innerHTML = "";
+    if (!mandalSel.value) return;
+
+    Object.keys(DATA[stateSel.value][districtSel.value][mandalSel.value]).forEach(v =>
+        villageSel.innerHTML += `<option value="${v}">${v}</option>`
+    );
+};
+
+/* VILLAGE */
+villageSel.onchange = () => {
+    schemeList.innerHTML = "";
+    selectedScheme = null;
+    viewBtn.disabled = true;
+
+    if (!villageSel.value) return;
+
+    DATA[stateSel.value][districtSel.value][mandalSel.value][villageSel.value]
+    .forEach(scheme => {
+        schemeList.innerHTML += `
+            <div class="scheme-card">
+                <h4>${scheme}</h4>
+                <a class="btn feedback-btn"
+                   href="/feedback?state=${stateSel.value}&district=${districtSel.value}&mandal=${mandalSel.value}&village=${villageSel.value}&scheme=${scheme}">
+                   📝 Give Feedback
+                </a>
+                <button class="btn report-btn" onclick="selectScheme('${scheme}')">
+                   📊 View Report
+                </button>
+            </div>
+        `;
+    });
+};
+
+/* REPORT */
+function selectScheme(scheme) {
+    selectedScheme = scheme;
+    viewBtn.disabled = false;
+
+    fetch(`/api/report?state=${stateSel.value}&district=${districtSel.value}&village=${villageSel.value}&scheme=${scheme}`)
+    .then(r => r.json())
+    .then(d => {
+
+        const pos = d.sentiments.positive || 0;
+        const neg = d.sentiments.negative || 0;
+        const neu = d.sentiments.neutral || 0;
+        const total = pos + neg + neu || 1;
+        const satisfaction = Math.round((pos / total) * 100);
+
+        let health = "POOR";
+        let healthClass = "health-poor";
+        if (satisfaction >= 60) { health = "GOOD"; healthClass = "health-good"; }
+        else if (satisfaction >= 40) { health = "NEEDS IMPROVEMENT"; healthClass = "health-medium"; }
+
+        reportBox.innerHTML = `
+        <div class="report-card">
+            <h4>${scheme}</h4>
+
+            <p>🟢 Scheme Health:
+                <span class="${healthClass}">${health}</span>
+            </p>
+
+            <p>Citizen Satisfaction</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width:${satisfaction}%"></div>
+            </div>
+            <small>${satisfaction}% citizens satisfied</small>
+
+            <hr>
+
+            <p><b>⚠️ Common Issues</b></p>
+            <ul>
+                ${(Object.keys(d.issues || {}).slice(0,3)
+                  .map(i => `<li>${i}</li>`).join("")) || "<li>No major issues reported</li>"}
+            </ul>
+
+            <p><b>🏛 Government Response</b></p>
+            <p>${total > 0 ? "✔ Feedback reviewed by officials" : "⏳ Awaiting review"}</p>
+
+            <p><b>🤖 Citizen Insight</b></p>
+            <p>
+                ${health === "GOOD"
+                    ? "Most citizens are satisfied, with minor issues reported."
+                    : "Citizens report mixed experiences. Improvements are needed."}
+            </p>
+
+            <p><b>👉 What can you do?</b></p>
+            <ul>
+                <li>Submit feedback if you face issues</li>
+                <li>Track updates regularly</li>
+                <li>Encourage others to share feedback</li>
+            </ul>
+        </div>
+        `;
+    });
+    fetchNotifications();
+
+}
+
+/* MY FEEDBACK */
+viewBtn.onclick = () => {
+    fetch(`/api/public/my-feedback?state=${stateSel.value}&district=${districtSel.value}&mandal=${mandalSel.value}&village=${villageSel.value}&scheme=${selectedScheme}`)
+    .then(r => r.json())
+    .then(data => {
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+            table.style.display = "none";
+            return;
+        }
+
+        data.forEach(f => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${f.date}</td>
+                    <td>${f.scheme}</td>
+                    <td>${f.village}, ${f.mandal}, ${f.district}</td>
+                    <td>${f.feedback}</td>
+                    <td>${f.issue}</td>
+                    <td><b>${f.sentiment}</b></td>
+                </tr>
+            `;
+        });
+
+        table.style.display = "table";
+    });
+};
+
+
+/* NOTIFICATIONS */
+function fetchNotifications() {
+    fetch(`/api/public/notifications?state=${stateSel.value}&district=${districtSel.value}&mandal=${mandalSel.value}&village=${villageSel.value}&scheme=${selectedScheme}`)
+    .then(r => r.json())
+    .then(d => {
+        if (!d.message) return;
+        document.getElementById("notificationText").innerText = d.message;
+        document.getElementById("notificationBox").style.display = "block";
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
+    fetch("/api/public/notifications/latest")
+    .then(res => res.json())
+    .then(data => {
+        if (!data.message) return;
+
+        const box = document.getElementById("notificationBox");
+        const text = document.getElementById("notificationText");
+
+        text.innerHTML = "🔔 " + data.message;
+        box.style.display = "block";
+    });
+});
+
+</script>
+
+</body>
+</html>

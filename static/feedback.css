@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #ff9933, #ffffff, #138808);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.feedback-container {
+    width: 100%;
+    max-width: 480px;
+}
+
+.header {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: #002147;
+    margin-bottom: 15px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.card h2 {
+    margin-top: 0;
+    color: #002147;
+}
+
+.region {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 12px;
+    display: block;
+}
+
+textarea {
+    width: 100%;
+    height: 120px;
+    margin-top: 6px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    resize: none;
+    font-size: 14px;
+}
+
+input[type="file"] {
+    margin-top: 6px;
+    font-size: 13px;
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #002147;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #00132d;
+}

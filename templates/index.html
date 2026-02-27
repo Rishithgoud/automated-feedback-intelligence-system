@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>National Feedback Portal</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="landing">
+
+<header class="landing-header">
+    <img src="{{ url_for('static', filename='emblem.png') }}" class="emblem">
+    <h1>National Government Feedback Portal</h1>
+    <p>Citizen & Government Scheme Monitoring System</p>
+</header>
+
+<div class="landing-actions">
+    <a href="/signin" class="btn primary">Sign In</a>
+    <a href="/signup" class="btn outline">Create Account</a>
+</div>
+
+<footer>
+    © Government of India · Prototype System
+</footer>
+
+</body>
+</html>

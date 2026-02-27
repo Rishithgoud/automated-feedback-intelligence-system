@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #f2f5f9;
+}
+
+/* TOP BAR */
+.top-bar {
+    background: linear-gradient(90deg, #002147, #001529);
+    color: white;
+    padding: 14px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-bar span {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* PROFILE */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    background: #ffd700;
+    color: black;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.profile a {
+    color: #ffd700;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+/* MAIN */
+.main {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* PANELS */
+.panel {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.panel h3 {
+    margin-top: 0;
+    color: #002147;
+}
+
+/* SELECT */
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* SCHEMES */
+.scheme-card {
+    background: #f9fbff;
+    border-left: 4px solid #002147;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.scheme-card h4 {
+    margin: 0 0 8px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn, button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: #002147;
+    color: white;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+button {
+    background: #138808;
+}
+
+/* REPORT */
+.report-box {
+    background: #f9fbff;
+    padding: 15px;
+    border-radius: 10px;
+}
