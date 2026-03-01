@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='analytics.css') }}">
+</head>
+<body>
+
+<h1 class="title">📊 Government Feedback Analytics</h1>
+
+<div class="grid">
+
+    <div class="card">
+        <h2>Sentiment Analysis</h2>
+        <canvas id="sentimentChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Issue Classification</h2>
+        <canvas id="issueChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Feedback Trend</h2>
+        <canvas id="trendChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Scheme Performance</h2>
+        <canvas id="schemeChart"></canvas>
+    </div>
+
+</div>
+
+<script>
+// Sentiment Chart
+new Chart(document.getElementById("sentimentChart"), {
+    type: "bar",
+    data: {
+        labels: ["Positive", "Neutral", "Negative"],
+        datasets: [{
+            data: [45, 30, 25],
+            backgroundColor: ["green", "gold", "red"]
+        }]
+    }
+});
+
+// Issue Chart
+new Chart(document.getElementById("issueChart"), {
+    type: "bar",
+    data: {
+        labels: ["Payment Delay", "Service Quality", "Eligibility", "Admin Problems", "Awareness"],
+        datasets: [{
+            data: [35, 20, 15, 18, 12],
+            backgroundColor: ["#3498db", "#f39c12", "#9b59b6", "#e74c3c", "#2ecc71"]
+        }]
+    }
+});
+
+// Trend Chart
+new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+        datasets: [
+            {
+                label: "Positive",
+                data: [150, 200, 180, 220, 260],
+                borderColor: "green"
+            },
+            {
+                label: "Negative",
+                data: [100, 120, 150, 140, 170],
+                borderColor: "red"
+            },
+            {
+                label: "Neutral",
+                data: [80, 90, 95, 100, 120],
+                borderColor: "orange"
+            }
+        ]
+    }
+});
+
+// Scheme Chart
+new Chart(document.getElementById("schemeChart"), {
+    type: "bar",
+    data: {
+        labels: ["Healthcare", "Education", "Pension", "Subsidy"],
+        datasets: [{
+            data: [80, 75, 60, 50],
+            backgroundColor: ["#2980b9", "#27ae60", "#f39c12", "#8e44ad"]
+        }]
+    }
+});
+</script>
+
+</body>
+</html>

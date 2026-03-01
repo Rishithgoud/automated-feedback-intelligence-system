@@ -499,7 +499,9 @@ def executive_insight():
     return jsonify({
         "insight": "\n".join(insight_lines)
     })
-
+@app.route("/govt/analytics")
+def govt_analytics():
+    return render_template("analytics.html")
 @app.route("/govt/feedback/<int:fid>")
 def govt_view_feedback(fid):
     conn = get_db()
