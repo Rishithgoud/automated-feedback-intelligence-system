@@ -1,3 +1,4 @@
+#SPDX-License-Identifier: MIT
 from flask import Flask, render_template, request, redirect, session, jsonify
 import sqlite3, os, datetime
 from textblob import TextBlob
@@ -288,7 +289,6 @@ RECOMMENDED ACTION:
 Focused administrative review and local-level monitoring are advised
 to prevent further public dissatisfaction and implementation risks.
 """.strip()
-SPDX-License-Identifier: MIT
     # ---- ISSUE COUNT ----
     issue_count = {}
     for f in feedback_rows:
